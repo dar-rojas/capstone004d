@@ -34,7 +34,7 @@ namespace Api.Models
         //Maximum battery capacity
         [Required(ErrorMessage = "Value is required.")]
         [GreaterThanZero]
-        public int MaxEnergy { get;set; }
+        public double MaxEnergy { get;set; }
 
         //Maximum SOC allowed
         [Required(ErrorMessage = "Value is required.")]
@@ -49,17 +49,17 @@ namespace Api.Models
         // Grid power limit
         [Required(ErrorMessage = "Value is required.")]
         [GreaterThanZero]
-        public int PowerLimit{ get;set; }
+        public double PowerLimit{ get;set; }
 
         //Max battery power
         [Required(ErrorMessage = "Value is required.")]
         [GreaterThanZero]
-        public int MaxBatteryPower { get;set; }
+        public double MaxBatteryPower { get;set; }
 
         // Min battery power
         [Required(ErrorMessage = "Value is required.")]
-        [Range(int.MinValue, 0, ErrorMessage = "Value must be less than or equal to 0")]
-        public int MinBatteryPower { get;set; }
+        [Range(double.MinValue, 0, ErrorMessage = "Value must be less than or equal to 0")]
+        public double MinBatteryPower { get;set; }
 
         // Charge efficiency
         [Required(ErrorMessage = "Value is required.")]
@@ -70,5 +70,25 @@ namespace Api.Models
         [Required(ErrorMessage = "Value is required.")]
         [DoublePercentage]
         public double DischargeEfficiency { get;set; }
+
+        [Required(ErrorMessage = "Value is required.")]
+        [GreaterThanZero]
+        public double UnservedEnergyCost { get;set; }
+
+        [Required(ErrorMessage = "Value is required.")]
+        [GreaterThanZero]
+        public double InitialEnergy { get;set; }
+
+        [Required(ErrorMessage = "Value is required.")]
+        [Range(0, double.MaxValue, ErrorMessage = "Value must be greater than or equal to 0")]
+        public double MonthMaxPower { get;set; }
+
+        [Required(ErrorMessage = "Value is required.")]
+        [Range(0, double.MaxValue, ErrorMessage = "Value must be greater than or equal to 0")]
+        public double MonthMaxPowerPH { get;set; }
+
+        [Required(ErrorMessage = "Value is required.")]
+        [GreaterThanZero]
+        public double DeltaT { get;set; }
     }
 }
