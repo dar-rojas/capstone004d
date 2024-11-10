@@ -5,21 +5,8 @@ using Api.Utils.Annotations;
 
 namespace Api.Models
 {
-    public class HistoricalData
+    public class HistoricalData : GridData
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }
-
-        [BsonElement("timestamp")]
-        [Required]
-        public DateTime Timestamp { get; set; }
-
-        [BsonElement("gridId")]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [Required]
-        public string? GridId { get; set; }
-
         [BsonElement("demandPower")]
         [GreaterThanZero]
         [Required]

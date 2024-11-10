@@ -8,6 +8,20 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
+    <!--Matlab-->
+    <Reference Include="MathWorks.MATLAB.Runtime">
+      <HintPath>C:\Program Files\MATLAB\MATLAB Runtime\R2024b\extern\dotnet\netstandard2.0\MathWorks.MATLAB.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="MathWorks.MATLAB.Types">
+      <HintPath>C:\Program Files\MATLAB\MATLAB Runtime\R2024b\extern\dotnet\netstandard2.0\MathWorks.MATLAB.Types.dll</HintPath>
+    </Reference>
+    <Content Include="Optimize\Optimize.ctf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Reference Include="Optimize">
+      <HintPath>Optimize\Optimize.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

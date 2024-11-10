@@ -4,6 +4,9 @@ using Api.Utils.DTOs;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Api.Optimize;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using MongoDB.Bson;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,4 +84,70 @@ app.MapPost("/add_historical_data", async (HistoricalDataRequest historicalDataR
     return Results.Created($"/historicalData", historicalDataEntries);
 });
 
+// Creates a new optimization
+app.MapPost("optimize", async (string gridId) =>
+{
+    // Validate that the GridId exists
+    var gridCollection = database.GetCollection<Grid>("grid");
+    var gridFilter = Builders<Grid>.Filter.Eq(g => g.Id, gridId);
+    var grid = await gridCollection.Find(gridFilter).FirstOrDefaultAsync();
+    if (grid == null)
+    {
+        return Results.NotFound($"Grid with Id {gridId} not found.");
+    }
+
+    // Validates that grid historical data exists
+    var historicalDataCollection = database.GetCollection<HistoricalData>("historicalData");
+    
+    var filter = Builders<HistoricalData>.Filter.Eq(h => h.GridId, gridId); // filter to match gridId
+
+    var historicalDataList = await historicalDataCollection
+        .Find(filter)
+        .SortByDescending(h => h.Timestamp) // most recent data
+        .Limit(192) // 48 hours 
+        .ToListAsync();  
+    if (historicalDataList.Count == 0)
+    {
+        return Results.NotFound($"Grid with Id {gridId} has no historical data.");
+    }
+    
+    // optimization
+    var optimizeAdapter = new OptimizeAdapter();
+    var output = new OptimizationOutput();
+    optimizeAdapter.Optimize(grid, historicalDataList, out output);
+    // updates grid variables
+    grid.MonthMaxPower = output.MaxPower > grid.MonthMaxPower ? output.MaxPower : grid.MonthMaxPower;
+    grid.MonthMaxPowerPH = output.MaxPowerPH > grid.MonthMaxPowerPH ? output.MaxPowerPH : grid.MonthMaxPower;
+    grid.InitialEnergy = output.BatteryEnergy[0];
+    var gridUpdate = await gridCollection.ReplaceOneAsync(gridFilter, grid);
+
+    // saves optimized values
+    var optimizedCollection = database.GetCollection<OptimizedData>("optimizedData");
+    // gets data to save
+    var optimizedDataEntries = output.BatteryPowers.Select((batteryPower, index) => new OptimizedData
+    {
+            BatteryPower = batteryPower,
+            BatteryEnergy = output.BatteryEnergy[index],
+            Timestamp = historicalDataList[index].Timestamp,
+            GridId = grid.Id
+    }).ToList();
+    // saves data
+    var upsertTask = optimizedDataEntries.Select(async newOptimizedData =>
+    {   
+        // Timestamp and grid Id filter
+        var filter = Builders<OptimizedData>.Filter.And(
+            Builders<OptimizedData>.Filter.Eq(op => op.Timestamp, newOptimizedData.Timestamp),
+            Builders<OptimizedData>.Filter.Eq(op => op.GridId, newOptimizedData.GridId)
+        );
+        var oldOptmizedData = await optimizedCollection.Find(filter).FirstOrDefaultAsync();
+        // Asign id
+        newOptimizedData.Id = oldOptmizedData == null ? ObjectId.GenerateNewId().ToString() : oldOptmizedData.Id;
+        // update or insert
+        await optimizedCollection.ReplaceOneAsync(filter, newOptimizedData, new ReplaceOptions { IsUpsert = true });
+        return newOptimizedData;
+    }).ToList();
+
+    var upsertedDataEntries = await Task.WhenAll(upsertTask); 
+    return Results.Ok(upsertedDataEntries);
+});
 app.Run();
