@@ -28,7 +28,8 @@ namespace Api.Optimize
                 // Optimizer output variables
                 dynamic solPb;
                 dynamic solEb;
-                dynamic solPgMax;
+                dynamic solPgMax1;
+                dynamic solPgMax2;
                 dynamic solPgMaxPH;
                 MATLABFunctions.optimize(
                     matlab,
@@ -46,21 +47,24 @@ namespace Api.Optimize
                     grid.MinBatteryPower,
                     grid.MaxBatteryPower,
                     peakHours,
-                    grid.MonthMaxPower,
+                    grid.MaxPower1,
+                    grid.MaxPower2,
                     grid.MonthMaxPowerPH,
                     grid.ChargeEfficiency,
                     1/grid.DischargeEfficiency,
                     out solPb,
                     out solEb,
-                    out solPgMax,
+                    out solPgMax1,
+                    out solPgMax2,
                     out solPgMaxPH
                 );
                 // Convertion to C# types
                 solPb = (double[]) solPb;
                 solEb = (double[]) solEb;
-                solPgMax = (double) solPgMax;
+                solPgMax1 = (double) solPgMax1;
+                solPgMax2 = (double) solPgMax2;
                 solPgMaxPH = (double) solPgMaxPH;
-                output = new OptimizationOutput(solPb, solEb, solPgMax, solPgMaxPH);
+                output = new OptimizationOutput(solPb, solEb, solPgMax1, solPgMax2, solPgMaxPH);
             }
         }
     }

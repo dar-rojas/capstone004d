@@ -38,8 +38,9 @@ public class OptimizedDataService
         optimizeAdapter.Optimize(grid, historicalDataList, out output);
 
         // updates grid variables
-        grid.MonthMaxPower = output.MaxPower > grid.MonthMaxPower ? output.MaxPower : grid.MonthMaxPower;
-        grid.MonthMaxPowerPH = output.MaxPowerPH > grid.MonthMaxPowerPH ? output.MaxPowerPH : grid.MonthMaxPower;
+        grid.MaxPower1 = output.MaxPower1 > grid.MaxPower1 ? output.MaxPower1 : grid.MaxPower1;
+        grid.MaxPower2 = output.MaxPower2 > grid.MaxPower2 ? output.MaxPower2 : grid.MaxPower2;
+        grid.MonthMaxPowerPH = output.MaxPowerPH > grid.MonthMaxPowerPH ? output.MaxPowerPH : grid.MonthMaxPowerPH;
         grid.InitialEnergy = output.BatteryEnergy[0];
         grid = await _gridService.UpdateGridAsync(grid);
 

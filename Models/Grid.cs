@@ -81,7 +81,11 @@ namespace Api.Models
 
         [Required(ErrorMessage = "Value is required.")]
         [Range(0, double.MaxValue, ErrorMessage = "Value must be greater than or equal to 0")]
-        public double MonthMaxPower { get;set; }
+        public double MaxPower1 { get;set; }
+
+        [Required(ErrorMessage = "Value is required.")]
+        [Range(0, double.MaxValue, ErrorMessage = "Value must be greater than or equal to 0")]
+        public double MaxPower2 { get;set; }
 
         [Required(ErrorMessage = "Value is required.")]
         [Range(0, double.MaxValue, ErrorMessage = "Value must be greater than or equal to 0")]

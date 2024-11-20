@@ -4,7 +4,8 @@ namespace Api.Utils.DTOs
     {
         public double[] BatteryPowers { get; set; }
         public double[] BatteryEnergy { get; set; }
-        public double MaxPower { get; set; }
+        public double MaxPower1 { get; set; }
+        public double MaxPower2 { get; set; }
         public double MaxPowerPH { get; set; }
 
         // default constructor
@@ -12,15 +13,17 @@ namespace Api.Utils.DTOs
         { 
             BatteryPowers = [];
             BatteryEnergy = [];
-            MaxPower = 0;
+            MaxPower1 = 0;
+            MaxPower2 = 0;
             MaxPowerPH = 0;
         }
         // constructor with parameters
-        public OptimizationOutput(double[] batteryPowers, double[] batteryEnergy, double maxPower, double maxPowerPH)
+        public OptimizationOutput(double[] batteryPowers, double[] batteryEnergy, double maxPower1, double maxPower2, double maxPowerPH)
         {
             BatteryPowers = batteryPowers;
             BatteryEnergy = batteryEnergy;
-            MaxPower = maxPower;
+            MaxPower1 = maxPower1;
+            MaxPower2 = maxPower2;
             MaxPowerPH = maxPowerPH;
         }
 
