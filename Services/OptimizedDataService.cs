@@ -4,6 +4,8 @@ using Api.Optimize;
 using MongoDB.Driver;
 using Api.Database;
 using MongoDB.Bson;
+using api.Utils.DTOs;
+using System.ComponentModel.DataAnnotations;
 
 namespace Api.Services;
 
@@ -76,5 +78,45 @@ public class OptimizedDataService
 
         var optimizedDataArray = await Task.WhenAll(upsertTask); 
         return optimizedDataArray;
+    }
+
+    public async Task<List<OptimizedData>> GetOptimizedDataAsync(OptimizedDataRequest optimizedDataRequest)
+    {
+        // validates grid existence 
+        await _gridService.GetGridAsync(optimizedDataRequest.GridId);
+
+        if (optimizedDataRequest.InitTimestamp == null)
+        {
+            throw new ArgumentException("InitTimestamp is required.");
+        }
+        if (optimizedDataRequest.EndTimestamp == null)
+        {
+            optimizedDataRequest.EndTimestamp = optimizedDataRequest.InitTimestamp;
+        }
+        // validates that InitTimestam is earlier than EndTimestamp
+        if (optimizedDataRequest.EndTimestamp < optimizedDataRequest.InitTimestamp)
+        {
+            throw new ArgumentException("InitTimestamp must be earlier than EndTimestamp");
+        }
+        // filters
+        var builder = Builders<OptimizedData>.Filter;
+        var filterGrid = builder.Eq(o => o.GridId, optimizedDataRequest.GridId);
+        var filterInit = builder.Gte(o => o.Timestamp, optimizedDataRequest.InitTimestamp);
+        var filterEnd = builder.Lte(o => o.Timestamp, optimizedDataRequest.EndTimestamp);
+        var filter = filterGrid & filterInit & filterEnd;
+        //get data 
+        var optimizedDataList = await _collection
+            .Find(filter)
+            .SortByDescending(o => o.Timestamp)
+            .Limit(1000)
+            .ToListAsync();
+        // validates that data exists
+        if (optimizedDataList.Count == 0)
+        {
+            throw new ArgumentException
+                ($"Grid with id {optimizedDataRequest.GridId} has no optimized data betwen " +
+                $"{optimizedDataRequest.InitTimestamp} and {optimizedDataRequest.EndTimestamp}");
+        }
+        return optimizedDataList;
     }
 }
