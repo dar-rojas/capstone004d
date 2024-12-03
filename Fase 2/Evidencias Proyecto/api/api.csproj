@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8779d499-2041-45b6-bd2e-22501ff65f45</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ui\**" />
+    <Content Remove="ui\**" />
+    <EmbeddedResource Remove="ui\**" />
+    <None Remove="ui\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
+    <!--Matlab-->
+    <Reference Include="MathWorks.MATLAB.Runtime">
+      <HintPath>C:\Program Files\MATLAB\MATLAB Runtime\R2024b\extern\dotnet\netstandard2.0\MathWorks.MATLAB.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="MathWorks.MATLAB.Types">
+      <HintPath>C:\Program Files\MATLAB\MATLAB Runtime\R2024b\extern\dotnet\netstandard2.0\MathWorks.MATLAB.Types.dll</HintPath>
+    </Reference>
+    <Content Include="Optimize\Optimize.ctf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Reference Include="Optimize">
+      <HintPath>Optimize\Optimize.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
